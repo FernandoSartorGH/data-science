@@ -1,0 +1,3 @@
+Criar um notebook com técnicas de de seleção de variáveis
+
+Deve ser feita após a separação dos dados em treino e teste

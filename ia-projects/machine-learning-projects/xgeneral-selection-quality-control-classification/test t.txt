@@ -1,0 +1,2 @@
+O test t para diferenças entre médias é um indicativo se a variável é relevante ou não para descrever a variável target.
+criar uma função para analisar cada variável em relação 

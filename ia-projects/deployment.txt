@@ -1,0 +1,11 @@
+disponibilizar cada projeto em todas as opções de deploy
+
+
+disponibilizar na ferramenta uma visão do ajuste aos dados de treino e de teste
+com resultados, teastes estatísticos e gráficos
+
+incluir a opção de o usuário inserir os dados manualmente pela ferramenta ou
+subir um arquivo com um lote de dados ou 
+selecionar uma isntância dos dados de teste. 
+	Neste último caso mostrar o valores de entradad e cada variável,
+	o valor real e o valor previsto, abos em destaque.

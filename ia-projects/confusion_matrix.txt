@@ -1,0 +1,1 @@
+A precisão é importante quando o custo dos falsos positivos é alto.

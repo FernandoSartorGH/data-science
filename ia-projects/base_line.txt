@@ -1,0 +1,13 @@
+REGRESSÃO
+
+knn
+regressão_linear
+árvore de decisão
+
+
+CLASSIFICAÇÃO
+
+knn
+regressão_logística
+árvore de decisão
+naive_bayes

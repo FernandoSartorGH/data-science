@@ -1,0 +1,2 @@
+A remoção de dados considerados como outliers pelo critério estatístico está sujeito à interpretação do problema.
+
