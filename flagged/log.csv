@@ -1,0 +1,4 @@
+grupo_sanguineo,fumante,nivel_de_atividade,idade,peso,altura,output,flag,username,timestamp
+A,true,Moderado,43,77.3,175,0,,,2024-10-08 17:59:42.659958
+A,true,Moderado,43,77.3,175,[201.31799329],,,2024-10-08 18:00:23.434160
+A,false,Moderado,43,77.4,175,[201.56180534],,,2024-10-08 18:01:15.030833
