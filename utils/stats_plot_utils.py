@@ -8,24 +8,24 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
 
 # Plot dist 2x2
-def residual_plot(serie, title):
+def residual_plot(y_pred, errors, title):
 
     # Plot
     fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(15, 8))
     fig.suptitle(f"{title}", fontsize=18)
 
     # Distribuição
-    ax[0,0].hist(serie)
+    ax[0,0].hist(errors)
     ax[0,0].set_title("Histograma")
-    ax[0,1].boxplot(serie)
+    ax[0,1].boxplot(errors)
     ax[0,1].set_title("Boxplot")
 
     # Scatter e linha de tendência
-    ax[1,0].scatter(serie.index, serie)
+    ax[1,0].scatter(y_pred, errors)
     ax[1,0].set_title("Homoscedasticity")
 
     # Auto correlação
-    plot_acf(serie, ax = ax[1,1])
+    plot_acf(errors, ax = ax[1,1])
 
     plt.ticklabel_format(style='plain', axis='y')
 
