@@ -2,6 +2,7 @@
 import pandas as pd
 
 # Statistic
+import pingouin as pg
 from statsmodels.graphics.gofplots import qqplot
 from scipy.stats import shapiro, kstest, probplot, anderson, normaltest
 from statsmodels.stats.diagnostic import lilliefors, het_goldfeldquandt
@@ -73,3 +74,53 @@ def residual_normal_test(errors):
     print(f" estatística de teste: {round(stat_and, 4)} | Valor crítico: {round(critical_and[2], 4)}")
     print(' Rejeita H0, os dados não seguem distribuição normal') if critical_and[2]< stat_and else print(' Não rejeita H0, os dados seguem distribuição normal')
     print('-'*55)
+
+
+# Teste chi2 para independência entre as variáveis
+def independence_chi2_test(df, target):
+    """
+    
+    Features independence (chi2)
+      H0: As variáveis são independentes
+      H1: As variáveis não são independentes
+      se p > 0.05 Aceita H0
+
+    valor_esperado: Frequência que seria esperada se não houvesse associação entre as variáveis calculada assumindo a distribuição do teste
+    valor_observado: Frequência real dos dados do df
+    
+    """
+
+    # Empty lists
+    p_value = []
+    cols = []
+    results = []
+
+    # print Hipoteses
+    print('H0: As variáveis são independentes')
+    print('H1: As variáveis não são independentes')
+    print('Alpha: 0.05')
+
+    # Iter
+    for col in df.columns:
+        valor_esperado, valor_observado, estatisticas = pg.chi2_independence(df, target, col)
+
+        pval = estatisticas[estatisticas['test']=='pearson']['pval'][0]
+        if pval > 0.05:
+            result = 'Aceita H0, as variáveis são independentes'
+        else:
+            result = 'Rejeita H0, as variáveis não são independentes'
+
+        p_value.append(pval)
+        cols.append(col)
+        results.append(result)
+
+    # Data Frame
+    data_df = {
+        'feature': cols,
+        'pval': p_value,
+        'result': results
+    }
+
+    df_result = pd.DataFrame(data_df)
+
+    return df_result

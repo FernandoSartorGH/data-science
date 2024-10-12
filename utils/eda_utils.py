@@ -4,7 +4,10 @@ import pandas as pd
 import unicodedata
 
 import seaborn as sns
+import plotly.express as px
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 # config seaborn
@@ -189,7 +192,7 @@ def box_plot_correlations_x(df, target):
 
 
 # Visualizar correlações com a variável target utilizando boxplot
-def box_plot_correlations(df, target): 
+def box_plot_correlations(df, target, order_target=None): 
     
     # filter df by numeric features
     if df[target].dtype == object or df[target].dtype == 'category':
@@ -198,7 +201,13 @@ def box_plot_correlations(df, target):
         df_plot = df.select_dtypes(include=[object, 'category'])
 
     if len(df_plot.columns) == 0:
-        return 'É necessário discretizar variáveis numéricas.'
+        return 'É necessário discretizar as variáveis numéricas.'
+
+    # Ordenar target se diferente de None
+    if order_target:
+        df_plot[target] = pd.Categorical(df_plot[target], categories=order_target)
+    else:
+        df_plot = df_plot
 
     # Definir subplot
     cols = 1
@@ -217,7 +226,9 @@ def box_plot_correlations(df, target):
                 sns.boxplot(data=df_plot, y=df_plot[col], x=df[target], ax=axes[i], orient='v', palette='Blues')
             else:
                 sns.boxplot(data=df_plot, x=df_plot[col], y=df[target], ax=axes[i], orient='v', palette='Blues')
-        except:
+        
+        except Exception as e:
+            print(f"Erro ao plotar {col}: {e}")
             continue
             
         axes[i].set_title(col, fontsize=14)
@@ -232,6 +243,112 @@ def box_plot_correlations(df, target):
     plt.tight_layout()
 
     return plt.show()
+
+
+# Visualizar correlações com a variável target categórica utilizando boxplot
+def box_plot_correlations_cat(df, target, order_target): 
+    
+    # Selecionar colunas para plotagem
+    df_plot = df.select_dtypes(include=['number', 'float', 'int'])
+    
+    if len(df_plot.columns) == 0:
+        return 'Não há variáveis numéricas para plotar.'
+
+    # Definir subplot
+    cols = 1
+    rows = math.ceil(len(df_plot.columns) / cols)
+
+    # Criar a figura e os subplots
+    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(10, 4 * rows)) 
+
+    # Flattening os eixos para facilitar o loop
+    axes = axes.flatten()
+
+    # Criar uma cópia do DataFrame para ordenação
+    df_ordered = df.copy()
+    if df[target].dtype == object or df[target].dtype == 'category':
+        df_ordered[target] = pd.Categorical(df_ordered[target], categories=order_target, ordered=True)
+    else:
+        df_ordered = df_ordered.sort_values(target)
+
+    # Loop para criar um boxplot para cada variável numérica
+    for i, col in enumerate(df_plot.columns):
+        try:
+            
+            sns.boxplot(data=df_ordered, y=col, x=target, ax=axes[i], orient='v', palette='Blues', order=order_target)
+            
+            axes[i].set_title(col, fontsize=14)
+            axes[i].set_xlabel(None)
+            axes[i].set_ylabel(None)
+            
+            # Rotacionar os rótulos do eixo x para melhor legibilidade
+            axes[i].tick_params(axis='x', rotation=45)
+
+        except Exception as e:
+            print(f"Erro ao plotar {col}: {e}")
+            continue
+
+    # Remover os subplots vazios
+    for j in range(i + 1, len(axes)):
+        fig.delaxes(axes[j])
+
+    # Layout
+    plt.suptitle(f'Variáveis Numéricas vs {target}\n', fontsize=18)
+    plt.tight_layout()
+
+    return plt.show()
+
+
+# Visualizar correlações com a variável target categórica utilizando boxplot do plotly
+def box_plots_corr_cat(df, target, order_target):
+    
+    # Selecionar colunas numéricas para plotagem
+    df_plot = df.select_dtypes(include=['number', 'float', 'int'])
+    
+    if len(df_plot.columns) == 0:
+        print('Não há variáveis numéricas para plotar.')
+        return
+
+    # Definir uma paleta de cores formal e adequada para visualização de dados
+    color_palette = px.colors.qualitative.Prism
+
+    # Criar subplots
+    fig = make_subplots(rows=len(df_plot.columns), cols=1, 
+                        subplot_titles=df_plot.columns,
+                        vertical_spacing=0.05)  # Reduzir o espaçamento vertical
+
+    # Iterar sobre as colunas numéricas
+    for i, col in enumerate(df_plot.columns, 1):
+        for j, category in enumerate(order_target):
+            trace = go.Box(
+                y=df[df[target] == category][col],
+                name=category,
+                marker_color=color_palette[j % len(color_palette)],
+                showlegend=False
+            )
+            fig.add_trace(trace, row=i, col=1)
+
+        # Atualizar os eixos
+        fig.update_xaxes(title_text=target if i == len(df_plot.columns) else None, 
+                         ticktext=order_target, tickvals=list(range(len(order_target))), 
+                         row=i, col=1)
+        fig.update_yaxes(title_text=col, row=i, col=1)
+
+    # Atualizar o layout geral
+    fig.update_layout(
+        title={
+            'text': f'Variáveis Numéricas vs {target}',
+            'x': 0.5,
+            'xanchor': 'center'
+        },
+        height=400 * len(df_plot.columns),  # Ajustar a altura total
+        width=900,
+        #boxmode='group',
+        template='plotly_white'
+    )
+
+    # Mostrar o gráfico
+    fig.show()
 
 
 # Visualizar correlações com a variável target utilizando boxplot
